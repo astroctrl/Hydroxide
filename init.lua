@@ -27,10 +27,6 @@ local function useMethods(module)
     end
 end
 
-if Window and PROTOSMASHER_LOADED then
-    getgenv().get_script_function = nil
-end
-
 local globalMethods = {
     checkCaller = checkcaller,
     newCClosure = newcclosure,
@@ -63,19 +59,13 @@ local globalMethods = {
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or istempleclosure or checkclosure,
-    hookMetaMethod = hookmetamethod or (hookfunction and function(object, method, hook) return hookfunction(getMetatable(object)[method], hook) end),
+    hookMetaMethod = trampolineMetatableHook,
     readFile = readfile,
     writeFile = writefile,
     makeFolder = makefolder,
     isFolder = isfolder,
     isFile = isfile,
 }
-
-if PROTOSMASHER_LOADED then
-    globalMethods.getConstant = function(closure, index)
-        return globalMethods.getConstants(closure)[index]
-    end
-end
 
 local oldGetUpvalue = globalMethods.getUpvalue
 local oldGetUpvalues = globalMethods.getUpvalues
@@ -154,33 +144,6 @@ environment.oh = {
         end
     end
 }
-
-if getConnections then 
-    for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-
-        local conn = getrawmetatable(connection)
-        local old = conn and conn.__index
-        
-        if PROTOSMASHER_LOADED ~= nil then setwriteable(conn) else setReadOnly(conn, false) end
-        
-        if old then
-            conn.__index = newcclosure(function(t, k)
-                if k == "Connected" then
-                    return true
-                end
-                return old(t, k)
-            end)
-        end
-
-        if PROTOSMASHER_LOADED ~= nil then
-            setReadOnly(conn)
-            connection:Disconnect()
-        else
-            setReadOnly(conn, true)
-            connection:Disable()
-        end
-    end
-end
 
 useMethods(globalMethods)
 

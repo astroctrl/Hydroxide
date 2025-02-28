@@ -1,4 +1,3 @@
-local CoreGui = game:GetService("CoreGui")
 local UserInput = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
 
@@ -97,15 +96,5 @@ Collapse.MouseButton1Click:Connect(function()
 	Open:TweenPosition(constants.reveal, "Out", "Quad", 0.15)
 end)
 
-Interface.Name = HttpService:GenerateGUID(false)
-if getHui then
-	Interface.Parent = getHui()
-else
-	if syn then
-		syn.protect_gui(Interface)
-	end
-
-	Interface.Parent = CoreGui
-end
-
+Interface.Parent = gethui()
 return Interface
