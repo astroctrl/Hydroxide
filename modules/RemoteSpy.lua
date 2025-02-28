@@ -48,13 +48,7 @@ local function connectEvent(callback)
     end
 end
 
-trampolineMetatableHook(game, "__namecall", function(...)
-    local instance = ...
-    
-    if typeof(instance) ~= "Instance" then
-        return ...
-    end
-
+trampolineMetatableHook(game, "__namecall", function(instance, ...)
     local method = getNamecallMethod()
 
     if method == "fireServer" then
